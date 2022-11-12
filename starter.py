@@ -34,7 +34,7 @@ def write_input(G: nx.Graph, path: str, overwrite: bool=False):
 def read_input(path: str):
     assert os.path.getsize(path) < INPUT_SIZE_LIMIT, 'This input file is too large'
     with open(path) as fp:
-        G = nx.node_link_graph(json.load(fp))
+        G = nx.node_link_graph(json.load(fp), multigraph=False)
         if validate_input(G):
             return G
 
@@ -76,6 +76,7 @@ def validate_input(G: nx.Graph):
     assert G.number_of_edges() <= MAX_EDGES, 'Graph has too many edges'
     assert sum(d for u, w, d in G.edges(data='weight')) >= MAX_WEIGHT*MAX_EDGES*0.05, \
         f'There must be at least {MAX_WEIGHT*MAX_EDGES*0.05} edge weight in the input.'
+    assert not G.is_multigraph()
     return validate_graph(G)
 
 
