@@ -1,4 +1,6 @@
 # GLOBAL VARS
+from partition import Parition
+import numpy as np
 G
 V = G.number_of_nodes()
 
@@ -20,3 +22,15 @@ def solve(G):
     Assign a team to v with G.nodes[v]['team'] = team_id
     Access the team of v with team_id = G.nodes[v]['team']
     '''
+    # random assignment
+
+    for k in feasible_ks:
+        # do we assume an order to the nodes? or try to be evenly-spaced
+        assignment = range(k) * (V/k)
+        ct = 0
+        for _ in range(len(next), V):
+            assignment.append(ct)
+            ct +=1
+        init_pi = Parition(assignment)
+
+        
