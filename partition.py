@@ -4,7 +4,7 @@ from utils import *
 G
 V = G.number_of_nodes()
 
-class Parition():
+class Partition():
     def __init__(self, assignment):
         '''
         Assignment: an array whose indices are vertex indices and entries
