@@ -160,5 +160,8 @@ def compute_swap_cost(v1, v2, curr_partition):
     # return the sum of these
     pass
 
+def cmp_Cp(b):
+    return math.exp(B_EXP * np.linalg.norm(b))
+
 def cmp_Ck(k):
     return K_COEFFICIENT * math.exp(K_EXP * k)

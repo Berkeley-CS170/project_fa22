@@ -1,33 +1,14 @@
 import random
-from partition import Parition
+from partition import Partition
 import numpy as np
 import utils
 
-G = utils.read_input(...)
-V = G.number_of_nodes()
-
-def compute_new_partition_cost(G,pi1, pi2,vertices):
-    # TODO: delete this function?
-
-    #will return the cost of pi2 - cost of pi1
-    for v in vertices:
-        old,new = pi1.assignment[v], pi2.assignment[v]   
-        pi1.update_Cp(old,new,v)
-        pi2.update_Cw(old,new,v)
-        pi1.b[pi1.assignment[v]] -= 1/V
-        pi1.b[pi2.assignment[v]] += 1/V
-        pi1.assignment[v] = pi2.assignment[v]
-        
-def assignment_array_to_graph(pi):
-    '''
-    Assigns G's teams from best policy's assignment.
-    '''
-    # TODO: delete this function?
+G = utils.read_input("inputs/small1.in")
 
 def random_team_assignment(num_teams):
     # assigns a team number to every vertex
 
-    vertices = G.nodes()
+    vertices = list(G.nodes())
     random.shuffle(vertices)
     vertex_teams = [-1 for _ in range(len(vertices))]
 
@@ -40,33 +21,28 @@ def random_team_assignment(num_teams):
 
 
 def explore_swaps(partition):
-    # this function returns the optimal set of swaps
+    # this function returns the optimal swap to take
     # note that Cp and Ck are not changed by a swap operation
 
-
-    #simulated annealing
     suggested_swap = (None, None)
-    lowest_Cw = partition.get_Cw()
-
-    #create list of unmarked vertices
-    # go through all unmarked pairs -> pick pair with the lagrest gain
-    # updated costs internally without swapping, but update costs as if you've done so
-    for v1 in G.nodes:
-        for v2 in G.nodes:
-            if (v1 != v2) and (partition.assignment[v1] != partition.assignment[v2]):
-                
-                if partition.calc_Cw_after_swapping_vertices(v1, v2) < lowest_Cw:
-                    lowest_Cw = partition.get_cost()
+    lowest_Cw = partition.Cw
+    for v1 in list(G.nodes):
+        for v2 in list(G.nodes):
+            if (v1 < v2) and (partition.assignment[v1] != partition.assignment[v2]):
+                updated_Cw = partition.calc_Cw_after_swapping_vertices(v1, v2)
+                if updated_Cw < lowest_Cw:
                     suggested_swap = (v1, v2)
+                    lowest_Cw = updated_Cw
+                    
+    return suggested_swap, lowest_Cw
 
-    return suggested_swap
 
-
-def solve(G):
+def solve():
     '''
     Assign a team to v with G.nodes[v]['team'] = team_id
     Access the team of v with team_id = G.nodes[v]['team']
     '''
+    print("starting")
     num_partitions = 3 # number of starting points for each value of k
     partitions = dict()
     current_lowest_cost = float("inf")
@@ -75,16 +51,31 @@ def solve(G):
     # is greater than the lowest current cost on record 
     k = 1
     while True:
+        print(k, utils.cmp_Ck(k), current_lowest_cost)
         partitions[k] = [Partition(assignment=random_team_assignment(k)) for _ in range(num_partitions)]
         for partition in partitions[k]:
             # improve our team assignments for a set amount of time
-            
-            # suggested_swap = explore_swaps(partition)
+            for counter in range(15):
+                suggested_swap, new_Cw = explore_swaps(partition)
+                if suggested_swap == (None, None):
+                    break
+                partition.swap_vertices(*suggested_swap, new_Cw)
+
+                if counter % 3 == 0:
+                    print("step")
+
+            if partition.get_cost() < current_lowest_cost:
+                current_lowest_cost = partition.get_cost()
+
+            # TODO: where do we add randomness?
             # do post-processing: take swap or not
 
         k += 1
-        if cmp_Ck(k) > current_lowest_cost:
+        if utils.cmp_Ck(k) > current_lowest_cost:
             break
            
+    # now, we have a set range for k
     # focus on trimming down our search space
 
+if __name__ == "__main__":
+    solve()
