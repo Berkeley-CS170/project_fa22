@@ -153,3 +153,8 @@ def tar(out_dir, overwrite=False):
         'File already exists and overwrite set to False. Move file or set overwrite to True to proceed.'
     with tarfile.open(path, 'w') as fp:
         fp.add(out_dir)
+
+# ours
+def compute_swap_cost(v1, v2, curr_partition):
+    # need to compute the Cw cost part(b)
+    # return the sum of these
