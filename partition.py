@@ -43,22 +43,22 @@ class Partition():
 
     def calc_Cw_after_swapping_vertices(self, v_i, v_j):
         Cw = self.C_w
-        
+
         i = self.assignment[v_i]
         j = self.assignment[v_j]
 
         #what if v_i and v_j were neighbors?
         for u in G.neighbors(v_i):
             if (self.assignment[u] == i) and (u != v_j):
-                Cw -= G[u][v]['weight']
+                Cw -= G[u][v_i]['weight']
             if (self.assignment[u] == j) and (u != v_j):
-                Cw += G[u][v]['weight']
+                Cw += G[u][v_i]['weight']
         
         for u in G.neighbors(v_j):
             if (self.assignment[u] == j) and (u != v_i):
-                Cw -= G[u][v]['weight']
+                Cw -= G[u][v_j]['weight']
             if (self.assignment[u] == i) and (u != v_i):
-                Cw += G[u][v]['weight']
+                Cw += G[u][v_j]['weight']
         
         return Cw
 

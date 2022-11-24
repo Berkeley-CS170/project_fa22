@@ -1,4 +1,5 @@
 import random
+from partition import Partition
 
 # GLOBAL VARS
 G
@@ -21,7 +22,7 @@ def random_team_assignment(num_teams):
     vertex_teams = [-1 for _ in range(len(vertices))]
 
     curr_team = 0
-    vertices = G.nodes()
+    vertices = G.nodes
     random.shuffle(vertices)
 
     for vertex in vertices:
