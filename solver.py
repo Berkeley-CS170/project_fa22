@@ -1,10 +1,15 @@
-# GLOBAL VARS
+import random
 from partition import Parition
 import numpy as np
-G
+import utils
+
+G = utils.read_input(...)
 V = G.number_of_nodes()
 
 def compute_new_partition_cost(G,pi1, pi2,vertices):
+    # TODO: delete this function?
+
+    #will return the cost of pi2 - cost of pi1
     for v in vertices:
         old,new = pi1.assignment[v], pi2.assignment[v]   
         pi1.update_Cp(old,new,v)
@@ -12,54 +17,74 @@ def compute_new_partition_cost(G,pi1, pi2,vertices):
         pi1.b[pi1.assignment[v]] -= 1/V
         pi1.b[pi2.assignment[v]] += 1/V
         pi1.assignment[v] = pi2.assignment[v]
-        #will return the cost of pi2 - cost of pi1
+        
 def assignment_array_to_graph(pi):
     '''
     Assigns G's teams from best policy's assignment.
     '''
+    # TODO: delete this function?
+
+def random_team_assignment(num_teams):
+    # assigns a team number to every vertex
+
+    vertices = G.nodes()
+    random.shuffle(vertices)
+    vertex_teams = [-1 for _ in range(len(vertices))]
+
+    curr_team = 0
+    for vertex in vertices:
+        vertex_teams[vertex] = curr_team
+        curr_team = (curr_team + 1) % num_teams
+    
+    return vertex_teams
+
+
+def explore_swaps(partition):
+    # this function returns the optimal set of swaps
+    # note that Cp and Ck are not changed by a swap operation
+
+
+    #simulated annealing
+    suggested_swap = (None, None)
+    lowest_Cw = partition.get_Cw()
+
+    #create list of unmarked vertices
+    # go through all unmarked pairs -> pick pair with the lagrest gain
+    # updated costs internally without swapping, but update costs as if you've done so
+    for v1 in G.nodes:
+        for v2 in G.nodes:
+            if (v1 != v2) and (partition.assignment[v1] != partition.assignment[v2]):
+                
+                if partition.calc_Cw_after_swapping_vertices(v1, v2) < lowest_Cw:
+                    lowest_Cw = partition.get_cost()
+                    suggested_swap = (v1, v2)
+
+    return suggested_swap
+
 
 def solve(G):
     '''
     Assign a team to v with G.nodes[v]['team'] = team_id
     Access the team of v with team_id = G.nodes[v]['team']
     '''
-    feasible_k = #upperbound on k
-    num_parititons = 1
-    for i in range(feasible_k):
+    num_partitions = 3 # number of starting points for each value of k
+    partitions = dict()
+    current_lowest_cost = float("inf")
 
-        #random assignment of teams
-        vertices = G.nodes
-        random.shuffle(vertices)
+    # this loop ends once we've reached a value of k where Ck (a lower bound)
+    # is greater than the lowest current cost on record 
+    k = 1
+    while True:
+        partitions[k] = [Partition(assignment=random_team_assignment(k)) for _ in range(num_partitions)]
+        for partition in partitions[k]:
+            # improve our team assignments for a set amount of time
+            
+            # suggested_swap = explore_swaps(partition)
+            # do post-processing: take swap or not
 
-        partitions = [Partition() for _ in range(num_partitions)]
-        vertex_teams = [-1 for _ in range(len(vertices))]
+        k += 1
+        if cmp_Ck(k) > current_lowest_cost:
+            break
+           
+    # focus on trimming down our search space
 
-        # todo: different assignments for each starting point (paritions)
-        # use some random library to assign teams or make helper function to assign teams
-        curr_team = 0
-        for vertex in vertices:
-            vertex_teams[vertex] = curr_team
-            curr_team += 1
-            if curr_team == i:
-                curr_team = 0
-        
-        vertices_copy = vertices
-        #stimulated annealing
-        swaps = (None, None)
-        lowest_cost = #cost of v1 staying in this team
-
-        # create set of unmarked vertices, while it is not empty -> go through the code below
-        # choose unmarked pair of vertices with largest gain
-
-        for v1 in vertices_copy:
-            for v2 in vertices_copy:
-                if (v1 != v2) and (vertex_teams[v1] != vertex_teams[v2]):
-                    #add own cost function without making new partition objects
-                    old_assignment = Partition(assignment=[vertex_teams[v1], vertex_teams[v2]])
-                    new_assignment = Partition(assignment=[vertex_teams[v2], vertex_teams[v1]])
-                    if compute_new_partition_cost(G, old_assignment, new_assignment, [v1, v2]) < lowest_cost:
-                        lowest_cost = compute_new_partition_cost(G, old_assignment, new_assignment, [v1, v2])
-                        swaps = (v1, v2)
-                    else #swap with some probability
-        if swaps != (None, None):
-            #swap
